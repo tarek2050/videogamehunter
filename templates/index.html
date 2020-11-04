@@ -1,0 +1,155 @@
+{% extends 'baseLayout.html' %}
+{% load static %}
+
+{% block content %}
+
+	<!-- start Category Area -->
+	<form method="get" style="display: none">
+		{{myCatFilter.form}}
+		<button id="btnClickCategoryForm" type="submit">Category Search</button>
+	</form>
+	<!-- end Category Area -->
+
+	<!-- start Search Area -->
+	<div class="container" style="margin-top: 50px;">
+		<div class="input-group mb-3">
+			<form method="get" style="display: none;">
+				<input type="text" name="q" id="id_Title__icontains">
+				<button id="btnClickCategory" type="submit">Search</button>
+			</form>
+
+			<input type="text" class="form-control" placeholder="Recherche" aria-label="Recipient's username" aria-describedby="basic-addon2" id="searchInput" onkeyup="mySearchFunction()">
+			<div class="input-group-append">
+			  <button class="btn btn-outline-secondary" type="button" onclick="mySearchBtnFunction()">Recherche</button>
+			</div>
+		  </div>
+	</div>
+	<!-- end Search Area -->
+
+	<!-- start product Area -->
+	<div class="container" style="margin-top: 100px;">
+		<div class="row">
+			{% if prods %}
+				{% for prod in prods %}
+					<!-- start product -->
+					<div class="col-lg-3 col-md-6">
+						<div class="single-product shadow-sm p-3 mb-5 bg-white rounded" style="height: 370px;">
+							<img class="img-fluid" src="{{prod.Img.url}}" alt="" style=" height: 180px;">
+							<div class="product-details">
+								<h6>{{ prod.Title }}</h6>
+								<div class="price">
+									<h6>{% if prod.Prix1 %}{{ prod.Prix1 }}{% endif %}</h6><br>
+									<h6 class="l-through">{% if prod.Prix2 %}{{ prod.Prix2 }}{% endif %}</h6>
+								</div>
+								<div class="prd-bottom">
+									<button type="button" class="btn btn-secondary"><a href="{% url 'prodDetail' slug=prod.Slug %}" style="color: white;">Vew More</a></button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- end product -->
+				{% endfor %}
+			{% else %}
+				<div class="alert alert-danger" role="alert" style="justify-content: center; margin: auto; margin-bottom: 100px;">
+					Aucun Produit Trouvé !
+				</div>
+			{% endif %}
+		</div>
+	</div>
+	<!-- end product Area -->
+
+	<!-- start pagination Area -->
+	<section id="newss">
+		<div class="container">
+			{% if prods.has_other_pages %}
+				<div class="row" style="justify-content: center; margin-bottom: 50px;">
+					<nav aria-label="Page navigation example">
+						<ul class="pagination">
+							{% if prods.has_previous %}
+								<li class="page-item">
+									<a class="page-link" href="?{% if query %}Category__contains={{ query }}&{% endif %}{% if tquery %}q={{ tquery }}&{% endif %}page={{ prods.previous_page_number }}" aria-label="Previous">
+									<span aria-hidden="true">&laquo;</span>
+									<span class="sr-only">Previous</span>
+									</a>
+								</li>
+							{% endif %}
+
+							{% for i in prods.paginator.page_range %}
+								{% if prods.number == i %}
+									<li class="page-item"><a class="page-link">{{ i }}</a></li>
+								{% elif prods.number >= i|add:is_mobile_negative and prods.number <= i|add:is_mobile %}
+									<li class="page-item"><a class="page-link" href="?{% if query %}Category__contains={{ query }}&{% endif %}{% if tquery %}q={{ tquery }}&{% endif %}page={{ i }}">{{ i }}</a></li>
+								{% endif %}
+							{% endfor %}
+
+							{% if prods.has_next %}
+								<li class="page-item">
+									<a class="page-link" href="?{% if query %}Category__contains={{ query }}&{% endif %}{% if tquery %}q={{ tquery }}&{% endif %}page={{ prods.next_page_number }}" aria-label="Next">
+									<span aria-hidden="true">&raquo;</span>
+									<span class="sr-only">Next</span>
+									</a>
+								</li>
+							{% endif %}
+						</ul>
+					</nav>
+				</div>
+			{% endif %}
+		</div>
+	</section>
+	<!-- end pagination Area -->
+
+	<!-- start news Area -->
+	<div class="container">
+		<div style="text-align: center; margin-bottom: 25px;">
+			<h2 style="color: #777777;">News Gaming</h2>
+		</div>
+	</div>
+	
+	<div class="container card-deck" style="justify-content: center; margin: auto; margin-bottom: 50px; ">
+		
+		{% if news %}
+			{% for new in news %}
+				<div class="card">
+					{% if new.link %}
+					<a href="{{ new.link }}" style="color: black;" target="_blank">
+						<img src="{{new.Img.url}}" class="card-img-top" alt="...">
+					</a>
+					{% else %}
+						<img src="{{new.Img.url}}" class="card-img-top" alt="...">
+					{% endif %}
+					<div class="card-body">
+						{% if new.link %}
+							<h5 class="card-title"><a href="{{ new.link }}" style="color: black;" target="_blank">{{ new.Title }}</a></h5>
+						{% else %}
+							<h5 class="card-title"><a href="javascript:void(0);" style="color: black;">{{ new.Title }}</a></h5>
+						{% endif %}
+						
+						<p class="card-text">{{ new.Description | safe }}</p>
+					</div>
+				</div>
+			{% endfor %}
+		{% endif %}
+	  </div>
+	<!-- end news Area -->
+
+	<div class="container">
+
+		<div style="text-align: center; margin-bottom: 25px;">
+			<h2 style="color: #777777;">STORIE</h2>
+		</div>
+		<div class="shadow-sm p-3 mb-5 bg-white rounded">
+			<div class="container card-deck" style="justify-content: center; margin: auto;">
+				{% for s in story %}
+					{% if s.Img %}
+					<div class="card">
+						<a href="{{s.Img.url}}" style="color: black; justify-content: center; margin: auto; box-shadow: 10px 10px 5px #5A6268;">
+							<img src="{{s.Img.url}}" class="card-img-top" alt="..." style="width: 100%; height: 250px;">
+						</a>
+					</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
